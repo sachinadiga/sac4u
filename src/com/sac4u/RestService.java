@@ -41,6 +41,7 @@ public class RestService {
     @Consumes(MediaType.APPLICATION_JSON)
 	public Response createApp(String jsonBody){
 		System.out.println("putApps()");
+		System.out.println("body=="+jsonBody);
 		String r = new Apps().insertApps(jsonBody);
 		return Response.status(201).entity(jsonBody).build();
 	}
