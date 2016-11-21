@@ -12,8 +12,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.sun.jersey.core.header.FormDataContentDisposition;
-import com.sun.jersey.multipart.FormDataParam;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 @Path("/file")
 public class UploadFileService {
@@ -24,8 +24,10 @@ public class UploadFileService {
 	public Response uploadFile(
 		@FormDataParam("file") InputStream uploadedInputStream,
 		@FormDataParam("file") FormDataContentDisposition fileDetail) {
+		
+		System.out.println("Inside uploadFile()");
 
-		String uploadedFileLocation = "./" + fileDetail.getFileName();
+		String uploadedFileLocation = "F:/workspace/Sac4U/WebContent/img/apps/" + fileDetail.getFileName();
 
 		// save it
 		writeToFile(uploadedInputStream, uploadedFileLocation);

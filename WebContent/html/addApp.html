@@ -45,7 +45,7 @@
 		      </div>
 		      <div class="form-group">
 		        <label for="appIcon">App Icon</label>
-		        <input type="file" class="form-control" ng-model="app.iconPath" placeholder="AppIcon" />
+		        <input type="file" class="form-control" file-model="fileName" ng-model="app.iconPath" placeholder="AppIcon" />
 		      </div>
 		      <button type="reset" class="btn reset" style="margin-left:35%; margin-right:50px;">Reset</button><button type="submit" class="btn btn-default">Submit</button>
 		    </form>
@@ -60,7 +60,7 @@ var mymodal = angular.module('mymodal', []);
 mymodal.controller('formController',function($scope,$http){
 	var url="http://localhost:8080/Sac4U/rest/service/putapps";
 	$scope.formSubmit = function(){
-		$scope.app.iconPath="facebook.png";
+//		$scope.app.iconPath="facebook.png";
 		$http.put(url, {requestBody:{apps:[$scope.app]}}).success( alert("success"));
 	}
 });
@@ -124,6 +124,62 @@ mymodal.directive('modal', function () {
       }
     };
   });
+  
+  
+mymodal.directive('fileModel', ['$parse', function ($parse) {
+    return {
+       restrict: 'A',
+       link: function(scope, element, attrs) {
+          var model = $parse(attrs.fileModel);
+          var modelSetter = model.assign;
+          
+          element.bind('change', function(){
+             scope.$apply(function(){
+                modelSetter(scope, element[0].files[0]);
+             });
+          });
+       }
+    };
+ }]);
+
+ mymodal.service('fileUpload', ['$http', function ($http) {
+    this.uploadFileToUrl = function(file, uploadUrl){
+       var fd = new FormData();
+       fd.append('file', file);
+    
+       $http.post(uploadUrl, fd, {
+          transformRequest: angular.identity,
+          headers: {'Content-Type': undefined}
+       })
+    
+       .success(function(){
+       })
+    
+       .error(function(){
+       });
+    }
+ }]);
+
+ mymodal.controller('formController', ['$scope','fileUpload', '$http', function($scope, fileUpload, $http){
+    $scope.uploadFile = function(){
+       var file = $scope.fileName;
+       console.log('file is ' );
+       console.dir(file);
+       $scope.app.iconPath=$scope.fileName.name;
+       
+       var uploadUrl = "http://localhost:8080/Sac4U/rest/file/upload";
+       fileUpload.uploadFileToUrl(file, uploadUrl);
+    };
+    
+	var url="http://localhost:8080/Sac4U/rest/service/putapps";
+	$scope.formSubmit = function(){
+		$scope.uploadFile();
+		$http.put(url, {requestBody:{apps:[$scope.app]}}).success(function(response) {
+            $scope.putResponse = response;
+            console.log(response);
+        });
+	}
+ }]);
 </script> 
    </body>
 </html>
